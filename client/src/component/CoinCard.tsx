@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { modeatom } from "../store/mode";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { harvestdataAtom } from "../store/HarvestData";
 
 type CoinHolding = {
   coin: string;
@@ -19,12 +20,23 @@ type CoinHolding = {
   };
 };
 
+type HarvestData = {
+  "short-term": {
+    profit: number;
+    loss: number;
+  };
+  "long-term": {
+    profit: number;
+    loss: number;
+  }
+};
+
 export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
+
   const mode = useRecoilValue(modeatom); 
-
   const [selectedCoins, setSelectedCoins] = useState<Set<string>>(new Set());
-
   const allCoins = useMemo(() => holdingData.map((item) => item.coin), [holdingData]);
+  const [harvestData, setHarvestData] = useRecoilState<HarvestData>(harvestdataAtom)
 
   const allSelected = useMemo(
     () => allCoins.length > 0 && allCoins.every((coin) => selectedCoins.has(coin)),
@@ -62,7 +74,46 @@ export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
             <input
               type="checkbox"
               checked={allSelected}
-              onChange={toggleAll}
+              onChange={()=>{
+                toggleAll()
+                
+                if(!allSelected){
+                  
+                  let sortTermLoss= 0;
+                  let sortTermProfit = 0;
+                  let longTermLoss = 0;
+                  let longTermProfit = 0;
+
+                  holdingData.map((item : CoinHolding)=>{
+                    sortTermLoss += item.stcg.balance
+                    sortTermProfit += item.stcg.gain
+                    longTermLoss += item.ltcg.balance
+                    longTermProfit += item.ltcg.gain
+                  })
+                      setHarvestData({
+                        "short-term":{
+                          "profit": sortTermProfit,
+                          "loss" : sortTermLoss
+                        },
+                        "long-term" : {
+                          "profit" : longTermProfit,
+                          "loss" : longTermLoss
+                        }
+                      })
+                    }
+                    else{
+                      setHarvestData({
+                        "short-term":{
+                          "profit": 0,
+                          "loss" : 0
+                        },
+                        "long-term":{
+                          "profit" : 0,
+                          "loss" : 0
+                        }
+                      })
+                    }
+                }}
               className={`h-4 w-4 ${isDark ? "accent-blue-400" : "accent-blue-600"}`}
               aria-label="Select All"
             />
@@ -95,7 +146,33 @@ export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
                   type="checkbox"
                   className="h-4 w-4"
                   checked={isSelected}
-                  onChange={() => toggleSelection(item.coin)}
+                  onChange={() => {
+                    toggleSelection(item.coin) 
+                    if(isSelected){
+                      setHarvestData({
+                        "short-term":{
+                          "profit": harvestData["short-term"].profit - item.stcg.gain,
+                          "loss" : harvestData["short-term"].loss - item.stcg.balance
+                        },
+                        "long-term" : {
+                          "profit" : harvestData["long-term"].profit - item.ltcg.gain,
+                          "loss" : harvestData["long-term"].loss - item.ltcg.balance,
+                        }
+                      })
+                    }
+                    else{
+                      setHarvestData({
+                        "short-term":{
+                          "profit": item.stcg.gain + harvestData["short-term"].profit,
+                          "loss" : item.stcg.balance + harvestData["short-term"].loss
+                        },
+                        "long-term":{
+                          "profit" : item.ltcg.gain + harvestData["long-term"].profit,
+                          "loss" : item.ltcg.balance + harvestData["long-term"].loss,
+                        }
+                      })
+                    }
+                  }}
                   aria-label={`Select ${item.coinName}`}
                 />
                 <img
