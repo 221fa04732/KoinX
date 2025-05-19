@@ -1,0 +1,157 @@
+import { useState, useMemo } from "react";
+import { modeatom } from "../store/mode";
+import { useRecoilValue } from "recoil";
+
+type CoinHolding = {
+  coin: string;
+  coinName: string;
+  logo: string;
+  currentPrice: number;
+  totalHolding: number;
+  averageBuyPrice: number;
+  stcg: {
+    balance: number;
+    gain: number;
+  };
+  ltcg: {
+    balance: number;
+    gain: number;
+  };
+};
+
+export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
+  const mode = useRecoilValue(modeatom); 
+
+  const [selectedCoins, setSelectedCoins] = useState<Set<string>>(new Set());
+
+  const allCoins = useMemo(() => holdingData.map((item) => item.coin), [holdingData]);
+
+  const allSelected = useMemo(
+    () => allCoins.length > 0 && allCoins.every((coin) => selectedCoins.has(coin)),
+    [allCoins, selectedCoins]
+  );
+
+  const toggleAll = () => {
+    setSelectedCoins(() => {
+      if (allSelected) return new Set();
+      return new Set(allCoins);
+    });
+  };
+
+  const toggleSelection = (coin: string) => {
+    setSelectedCoins((prev) => {
+      const newSet = new Set(prev);
+      newSet.has(coin) ? newSet.delete(coin) : newSet.add(coin);
+      return newSet;
+    });
+  };
+
+  const getGainColor = (gain: number) =>
+    gain >= 0 ? "text-green-600" : "text-red-600";
+
+  const isDark = mode === "dark";
+
+  return (
+    <div className="w-full overflow-x-auto">
+      <div className="min-w-[1024px] w-full flex flex-col divide-y "
+        style={{ borderColor: isDark ? "#374151" : "#D1D5DB" }} >
+
+        <div
+          className={`flex items-center px-4 py-3 font-semibold text-sm ${isDark ? "bg-gray-800 text-gray-100" : "bg-gray-100 text-gray-700"} `}>
+          <div className="flex items-center gap-3 flex-[2] min-w-[200px] ">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={toggleAll}
+              className={`h-4 w-4 ${isDark ? "accent-blue-400" : "accent-blue-600"}`}
+              aria-label="Select All"
+            />
+            <span>Asset</span>
+          </div>
+          <div className="flex-1 text-right">Holding / Market Rate</div>
+          <div className="flex-1 text-right">Total Value</div>
+          <div className="flex-1 text-right">STCG</div>
+          <div className="flex-1 text-right">LTCG</div>
+          <div className="flex-1 text-right">Amount to Sell</div>
+        </div>
+
+        {holdingData.length === 0 ? <div className="w-full h-24 flex justify-center items-center text-red-500">
+          <div className="">
+            Server Error!
+          </div>
+        </div> : 
+        holdingData.map((item) => {
+          const isSelected = selectedCoins.has(item.coin);
+          const sellPrice = item.totalHolding * item.currentPrice;
+
+          return (
+            <div
+              key={item.coin+item.coinName}
+              className={`flex items-center px-4 py-4 transition ${isDark ? "hover:bg-blue-950" : "hover:bg-blue-100"}`}
+            >
+              {/* Asset Info */}
+              <div className="flex items-center gap-3 flex-[2] min-w-[200px]">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={isSelected}
+                  onChange={() => toggleSelection(item.coin)}
+                  aria-label={`Select ${item.coinName}`}
+                />
+                <img
+                  src={item.logo}
+                  alt={`${item.coinName} logo`}
+                  className="w-6 h-6 rounded-full"
+                />
+                <div>
+                  <div className={`text-sm font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>
+                    {item.coinName}
+                  </div>
+                  <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>{item.coin}</div>
+                </div>
+              </div>
+
+              {/* Holding / Price */}
+              <div className={`flex-1 text-right text-sm flex flex-col items-end ${isDark ? "text-gray-100" : "text-gray-900"}`}>
+                <div>{item.totalHolding.toFixed(2)} {item.coin}</div>
+                <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                  ${item.currentPrice.toFixed(2)}
+                </div>
+              </div>
+
+              {/* Total Value */}
+              <div className={`flex-1 text-right text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>
+                ${(item.totalHolding * item.currentPrice).toFixed(2)}
+              </div>
+
+              {/* STCG */}
+              <div className="flex-1 text-right text-sm">
+                <div className={`${getGainColor(item.stcg.gain)} font-semibold`}>
+                  {item.stcg.gain.toFixed(2)}%
+                </div>
+                <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                  ${item.stcg.balance.toFixed(2)}
+                </div>
+              </div>
+
+              {/* LTCG */}
+              <div className="flex-1 text-right text-sm">
+                <div className={`${getGainColor(item.ltcg.gain)} font-semibold`}>
+                  {item.ltcg.gain.toFixed(2)}%
+                </div>
+                <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                  ${item.ltcg.balance.toFixed(2)}
+                </div>
+              </div>
+
+              {/* Sell Amount */}
+              <div className={`flex-1 text-right font-semibold ${isDark ? "text-gray-200" : "text-gray-700"}`}>
+                {isSelected ? `${sellPrice.toFixed(2)} ${item.coin}` : "-"}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
