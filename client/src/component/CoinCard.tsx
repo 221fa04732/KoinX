@@ -31,12 +31,23 @@ type HarvestData = {
   }
 };
 
-export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
+export default function Coin({ data }: { data: CoinHolding[] }) {
+
+
+  const [hasMore, setHasMOre] = useState<boolean>(true)
+  let holdingData : CoinHolding[] = []
+  if(hasMore){
+    holdingData.push(...data.slice(0,5))
+  }
+  else{
+    holdingData = data;
+  }
 
   const mode = useRecoilValue(modeatom); 
   const [selectedCoins, setSelectedCoins] = useState<Set<string>>(new Set());
   const allCoins = useMemo(() => holdingData.map((item) => item.coin), [holdingData]);
   const [harvestData, setHarvestData] = useRecoilState<HarvestData>(harvestdataAtom)
+  
 
   const allSelected = useMemo(
     () => allCoins.length > 0 && allCoins.every((coin) => selectedCoins.has(coin)),
@@ -64,13 +75,13 @@ export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
   const isDark = mode === "dark";
 
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="min-w-[1024px] w-full flex flex-col divide-y "
+    <div className="w-full overflow-x-auto custom-scrollbar px-4">
+      <div className="min-w-[1024px] w-full flex flex-col divide-y"
         style={{ borderColor: isDark ? "#374151" : "#D1D5DB" }} >
-
+      <div className={`${mode==='light' ? "text-black" : "text-white"} pt-2 pb-3 font-bold text-xl`}>Holdings</div>
         <div
-          className={`flex items-center px-4 py-3 font-semibold text-sm ${isDark ? "bg-gray-800 text-gray-100" : "bg-gray-100 text-gray-700"} `}>
-          <div className="flex items-center gap-3 flex-[2] min-w-[200px] ">
+          className={`flex items-center px-4 py-3 font-semibold text-sm rounded-md border ${isDark ? "bg-gray-800 text-gray-100" : "bg-gray-100 text-gray-700"}`}>
+          <div className="flex items-center gap-3 flex-[2] min-w-[200px]">
             <input
               type="checkbox"
               checked={allSelected}
@@ -138,9 +149,7 @@ export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
           return (
             <div
               key={item.coin+item.coinName}
-              className={`flex items-center px-4 py-4 transition ${isDark ? "hover:bg-blue-950" : "hover:bg-blue-100"}`}
-            >
-              {/* Asset Info */}
+              className={`flex items-center px-4 py-4 transition ${isDark ? "hover:bg-blue-950" : "hover:bg-blue-100"}`}>
               <div className="flex items-center gap-3 flex-[2] min-w-[200px]">
                 <input
                   type="checkbox"
@@ -173,13 +182,11 @@ export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
                       })
                     }
                   }}
-                  aria-label={`Select ${item.coinName}`}
-                />
+                  aria-label={`Select ${item.coinName}`}/>
                 <img
                   src={item.logo}
                   alt={`${item.coinName} logo`}
-                  className="w-6 h-6 rounded-full"
-                />
+                  className="w-6 h-6 rounded-full"/>
                 <div>
                   <div className={`text-sm font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>
                     {item.coinName}
@@ -188,7 +195,6 @@ export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
                 </div>
               </div>
 
-              {/* Holding / Price */}
               <div className={`flex-1 text-right text-sm flex flex-col items-end ${isDark ? "text-gray-100" : "text-gray-900"}`}>
                 <div>{item.totalHolding.toFixed(2)} {item.coin}</div>
                 <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>
@@ -196,12 +202,10 @@ export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
                 </div>
               </div>
 
-              {/* Total Value */}
               <div className={`flex-1 text-right text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>
                 ${(item.totalHolding * item.currentPrice).toFixed(2)}
               </div>
 
-              {/* STCG */}
               <div className="flex-1 text-right text-sm">
                 <div className={`${getGainColor(item.stcg.gain)} font-semibold`}>
                   {item.stcg.gain.toFixed(2)}%
@@ -211,7 +215,6 @@ export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
                 </div>
               </div>
 
-              {/* LTCG */}
               <div className="flex-1 text-right text-sm">
                 <div className={`${getGainColor(item.ltcg.gain)} font-semibold`}>
                   {item.ltcg.gain.toFixed(2)}%
@@ -221,13 +224,17 @@ export default function Coin({ holdingData }: { holdingData: CoinHolding[] }) {
                 </div>
               </div>
 
-              {/* Sell Amount */}
               <div className={`flex-1 text-right font-semibold ${isDark ? "text-gray-200" : "text-gray-700"}`}>
                 {isSelected ? `${sellPrice.toFixed(2)} ${item.coin}` : "-"}
               </div>
             </div>
           );
         })}
+        <div className="w-full flex justify-start">
+          <button className="underline ml-3 text-blue-600 text-sm mt-1 mb-2" onClick={()=>{
+            setHasMOre(!hasMore)
+          }}>{hasMore ? "View All": "Hide"}</button>
+        </div>
       </div>
     </div>
   );

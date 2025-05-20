@@ -25,7 +25,7 @@ export default function Content(){
                     <Harvest cngColour={false} name={"After Harvesting"}/>
                 
             </div>
-            <div className={`${mode === 'light' ? "bg-white" : "bg-gray-800"} w-full shadow-lg rounded-b-md mb-6`}>
+            <div className={`${mode === 'light' ? "bg-white" : "bg-gray-800"} w-full shadow-lg rounded-md mb-6`}>
                 <Holding />
             </div>
         </div>

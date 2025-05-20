@@ -55,8 +55,8 @@ export default function Holding(){
         return(<HoaldingLoader />)
     }
 
-    return (<div className='overflow-x-scroll'>
-        <Coin holdingData={holdingData} />
+    return (<div>
+        <Coin data={holdingData} />
     </div>)
         
 }
