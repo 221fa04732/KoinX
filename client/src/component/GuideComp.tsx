@@ -15,7 +15,7 @@ export default function Guid() {
                     How it works?
                 </div>
 
-                <div className={`absolute top-full mt-2 z-50 hidden group-hover:block ${mode === "light" ? "bg-gray-800 text-white" : "bg-white text-black"} p-4 shadow-lg rounded w-96`}>
+                <div className={`absolute top-full mt-2 z-20 hidden group-hover:block ${mode === "light" ? "bg-gray-800 text-white" : "bg-white text-black"} p-4 shadow-lg rounded w-96`}>
                     Hii My name is Mrityunjay Kumar, I am a passoniate software developer currently purshing B.Tech in computer science and engineering. <span className="text-blue-600 underline">Know More</span>
                 </div>
             </div>
