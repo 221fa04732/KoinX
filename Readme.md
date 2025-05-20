@@ -5,7 +5,7 @@ Deployed Link: https://koin-x-two-khaki.vercel.app/
 ---
 # Video
 
-https://github.com/user-attachments/assets/d114b625-ae65-4ac9-8a29-021a9af98483
+https://github.com/user-attachments/assets/8609794b-02b9-48ec-98cd-deaeb144827c
 
 ---
 
