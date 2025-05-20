@@ -5,13 +5,13 @@ Deployed Link: https://koin-x-two-khaki.vercel.app/
 ---
 # Video
 
-https://github.com/user-attachments/assets/66876e75-a9c0-4999-a7da-295cc11499a2
+https://github.com/user-attachments/assets/d114b625-ae65-4ac9-8a29-021a9af98483
 
 ---
 
 ## Local Setup
 
-Download the repo: https://github.com/221fa04732/KoinX.git
+Clone the repo: https://github.com/221fa04732/KoinX.git
 
 ### Backend:
 - cd server  
@@ -21,7 +21,7 @@ Download the repo: https://github.com/221fa04732/KoinX.git
 ### Frontend:
 - cd client  
 - npm install  
-- change the `backend_url` to local development in `src/config.js`  
+- change the `backend_url` to local development in `src/config.ts`  
 - npm run dev  
 
 ---
