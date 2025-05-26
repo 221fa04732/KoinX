@@ -2,6 +2,8 @@
 
 Deployed Link: https://koin-x-two-khaki.vercel.app/
 
+Monitor your crypto portfolio's growth effortlessly. Track holdings from all your wallets and accounts under a unified dashboard.
+
 ---
 # Video
 
